@@ -23,10 +23,10 @@ public class AdoptActivity extends AppCompatActivity {
 
     ImageButton btnBack, btnNext;
     private int catNum = 0;
-    private int KITTENS = 3;
+    private int KITTENS = 5;
     SoundPool soundPool;
     private class Kitten {
-        ImageView imgBody, imgHead, imgHeadDecor;
+        ImageView imgBody, imgBodyDecor, imgHead, imgHeadDecor;
         int skinColors[];
         int SKIN_COLORS = 9;
         int cries[];
@@ -71,6 +71,9 @@ public class AdoptActivity extends AppCompatActivity {
             imgBody = new ImageView(AdoptActivity.this);
             imgBody.setImageResource(R.mipmap.img_kitty_body_white);
             addImage(imgBody);
+            imgBodyDecor = new ImageView(AdoptActivity.this);
+            imgBodyDecor.setImageResource(R.mipmap.img_kitty_body_overlay_white);
+            addImage(imgBodyDecor);
             imgHead = new ImageView(AdoptActivity.this);
             imgHead.setImageResource(R.mipmap.img_kitty_head_white);
             addImage(imgHead);
@@ -78,15 +81,23 @@ public class AdoptActivity extends AppCompatActivity {
             imgHeadDecor.setImageResource(R.mipmap.img_kitty_head_overlay_white);
             addImage(imgHeadDecor);
 
-            //Set skin tones
+            //Skin tones
             Random rand = new Random();
             int skinColor = skinColors[rand.nextInt(SKIN_COLORS)];
             imgBody.setColorFilter(skinColor, PorterDuff.Mode.MULTIPLY);
+            skinColor = skinColors[rand.nextInt(SKIN_COLORS)];
             imgHead.setColorFilter(skinColor, PorterDuff.Mode.MULTIPLY);
 
-            int decorColor = skinColors[rand.nextInt(SKIN_COLORS)];
-            imgHeadDecor.setColorFilter(decorColor, PorterDuff.Mode.MULTIPLY);
+            //Overlay skin tones
+            skinColor = skinColors[rand.nextInt(SKIN_COLORS)];
+            imgBodyDecor.setColorFilter(skinColor, PorterDuff.Mode.MULTIPLY);
+            skinColor = skinColors[rand.nextInt(SKIN_COLORS)];
+            imgHeadDecor.setColorFilter(skinColor, PorterDuff.Mode.MULTIPLY);
+
+            //Overlay on/off
             int visible = 0;
+            if (rand.nextBoolean()) { visible = 255; }
+            imgBodyDecor.setImageAlpha(visible);
             if (rand.nextBoolean()) { visible = 255; }
             imgHeadDecor.setImageAlpha(visible);
 
@@ -95,6 +106,8 @@ public class AdoptActivity extends AppCompatActivity {
             int y = 1400;
             imgBody.setX(x);
             imgBody.setY(y);
+            imgBodyDecor.setX(imgBody.getX());
+            imgBodyDecor.setY(imgBody.getY());
             imgHead.setX(x - 180);
             imgHead.setY(y - 220);
             imgHeadDecor.setX(imgHead.getX());
@@ -142,6 +155,7 @@ public class AdoptActivity extends AppCompatActivity {
             int showState = View.INVISIBLE;
             if (state) { showState = View.VISIBLE; }
             imgBody.setVisibility(showState);
+            imgBodyDecor.setVisibility(showState);
             imgHead.setVisibility(showState);
             imgHeadDecor.setVisibility(showState);
         }
