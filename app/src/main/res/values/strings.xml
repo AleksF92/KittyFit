@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">KittyFit</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="menu_adopt">Adopt kitten</string>
+    <string name="menu_options">Options</string>
+    <string name="title_activity_adopt">AdoptActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+</resources>
