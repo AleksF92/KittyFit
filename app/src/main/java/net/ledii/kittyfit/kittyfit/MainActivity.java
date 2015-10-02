@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    Kitten kitten;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +57,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //print("You clicked the button!");
-                startActivity(new Intent(MainActivity.this, AdoptActivity.class));
+                Intent intent = new Intent(MainActivity.this, AdoptActivity.class);
+                startActivityForResult(intent, 0);
             }
         });
 
@@ -65,5 +68,36 @@ public class MainActivity extends AppCompatActivity {
                 print("Options is not aviable yet!");
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        //print("Activity finished!");
+
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                //print("Result was OK!");
+
+                Bundle data = intent.getExtras();
+                String name = data.getString("name");
+                int bCol = data.getInt("bodyColor");
+                int hCol = data.getInt("headColor");
+                int bdCol = data.getInt("bodyDecorColor");
+                int hdCol = data.getInt("headDecorColor");
+
+                if (kitten != null) {
+                    kitten.destroy();
+                    kitten = null;
+                }
+
+                View thisView = findViewById(R.id.mainView);
+                kitten = new Kitten(this, thisView, bCol, hCol, bdCol, hdCol);
+                kitten.setName(name);
+                kitten.show(true);
+
+                print("You have adopted " + kitten.getName() + "!");
+            }
+        }
     }
 }

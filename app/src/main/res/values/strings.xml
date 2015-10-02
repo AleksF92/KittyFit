@@ -5,6 +5,7 @@
     <string name="menu_adopt">Adopt kitten</string>
     <string name="menu_options">Options</string>
     <string name="title_activity_adopt">AdoptActivity</string>
+    <string name="adopt_adopt">Adopt</string>
 
     <string name="hello_world">Hello world!</string>
 </resources>
