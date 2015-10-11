@@ -1,26 +1,41 @@
 package net.ledii.kittyfit.kittyfit;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Handler;
+import android.support.v4.view.MotionEventCompat;
+import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    Kitten kitten;
+    private TopMenu topMenu;
+    private Kitten kitten;
+    private SharedPreferences storedData;
+    private VelocityTracker touchTracker;
+    private StatusBar barFood;
+    private Runnable runGameLogic;
+    private Handler runThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setupButtons();
+        setupViews();
+        loadGame();
     }
 
     @Override
@@ -49,55 +64,227 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(MainActivity.this, txt, Toast.LENGTH_SHORT).show();
     }
 
-    private void setupButtons() {
-        Button btnAdopt = (Button) findViewById(R.id.btn_Adopt);
-        Button btnOptions = (Button) findViewById(R.id.btn_Options);
+    private void setupViews() {
+        View thisView = findViewById(R.id.mainView);
+        topMenu = new TopMenu(this, thisView);
 
-        btnAdopt.setOnClickListener(new View.OnClickListener() {
+        thisView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                //print("You clicked the button!");
-                Intent intent = new Intent(MainActivity.this, AdoptActivity.class);
-                startActivityForResult(intent, 0);
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN: {
+                        //Log.d("DEBUG", "Action was DOWN");
+                        if (touchTracker == null) {
+                            touchTracker = VelocityTracker.obtain();
+                        } else {
+                            touchTracker.clear();
+                        }
+                        touchTracker.addMovement(event);
+                        break;
+                    }
+                    case MotionEvent.ACTION_MOVE: {
+                        //Log.d("DEBUG", "Action was MOVE");
+                        touchTracker.addMovement(event);
+                        touchTracker.computeCurrentVelocity(1000);
+                        int pointerId = event.getPointerId(event.getActionIndex());
+                        float x = VelocityTrackerCompat.getXVelocity(touchTracker, pointerId);
+                        float y = VelocityTrackerCompat.getYVelocity(touchTracker, pointerId);
+
+                        if (y >= 3000) {
+                            topMenu.show();
+                        } else if (y <= -3000) {
+                            topMenu.hide();
+                            if (kitten != null) {
+                                barFood.setVisible(View.VISIBLE);
+                            }
+                        }
+                        //Log.d("DEBUG", "X: " + x + ", Y: " + y);
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        //Log.d("DEBUG", "Action was UP");
+                        break;
+                    }
+                }
+
+                return true;
             }
         });
 
-        btnOptions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                print("Options is not aviable yet!");
-            }
-        });
+        barFood = new StatusBar(this, thisView);
+        Global.addViewToParent(thisView, barFood, RelativeLayout.ALIGN_TOP, RelativeLayout.ALIGN_LEFT);
+        barFood.setY(500);
+        barFood.setHint("Food: ");
+        barFood.setSuffix("h");
+        barFood.setMaxValue(48);
+        barFood.setValue(48);
+        barFood.setVisible(View.INVISIBLE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        //print("Activity finished!");
 
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-                //print("Result was OK!");
-
+                //Grab data
                 Bundle data = intent.getExtras();
-                String name = data.getString("name");
-                int bCol = data.getInt("bodyColor");
-                int hCol = data.getInt("headColor");
-                int bdCol = data.getInt("bodyDecorColor");
-                int hdCol = data.getInt("headDecorColor");
 
+                //Clear previous kitten if any
                 if (kitten != null) {
                     kitten.destroy();
                     kitten = null;
                 }
 
-                View thisView = findViewById(R.id.mainView);
-                kitten = new Kitten(this, thisView, bCol, hCol, bdCol, hdCol);
-                kitten.setName(name);
-                kitten.show(true);
+                //Create kitten
+                makeKitten(data, true);
 
+                //Save to database
+                saveKitten(kitten.getData());
+
+                //Hide list
+                topMenu.showList(View.INVISIBLE);
                 print("You have adopted " + kitten.getName() + "!");
             }
+        }
+    }
+
+    private void loadKitten() {
+        String name = storedData.getString("kittenName", "");
+
+        if (name != "") {
+            Bundle data = new Bundle();
+            data.putString("kittenName", storedData.getString("kittenName", ""));
+            data.putInt("kittenBodyColor", storedData.getInt("kittenBodyColor", 0));
+            data.putInt("kittenHeadColor", storedData.getInt("kittenHeadColor", 0));
+            data.putInt("kittenBodyDecorColor", storedData.getInt("kittenBodyDecorColor", 0));
+            data.putInt("kittenHeadDecorColor", storedData.getInt("kittenHeadDecorColor", 0));
+            data.getFloat("kittenVoice", storedData.getFloat("kittenVoice", 1));
+            data.putLong("kittenLastFedTime", storedData.getLong("kittenLastFedTime", 0));
+
+            makeKitten(data, false);
+        }
+    }
+
+    private void makeKitten(Bundle data, boolean feed) {
+        View thisView = findViewById(R.id.mainView);
+        kitten = new Kitten(this, thisView, data);
+        kitten.show(true);
+        if (feed) {
+            kitten.feed();
+        }
+
+        barFood.setVisible(View.VISIBLE);
+        topMenu.enableAdoption(false);
+    }
+
+    private void loadGame() {
+        storedData = getSharedPreferences("LediiData", MODE_PRIVATE);
+        loadKitten();
+
+        if (kitten != null) {
+            //setScene("home");
+        }
+
+        runThread = new Handler();
+        runGameLogic = new Runnable() {
+            @Override
+            public void run() {
+                if (kitten != null) {
+                    int hoursLeft = barFood.getMaxValue() - kitten.hoursSinceLastFed();
+                    barFood.setValue(hoursLeft);
+
+                    if (hoursLeft < 0) {
+                        clearKitten();
+                    }
+                }
+
+                //Next tick
+                runThread.post(runGameLogic);
+            }
+        };
+        runThread.post(runGameLogic);
+    }
+
+    public void sceneUpdate(String scenario) {
+        switch (scenario) {
+            case "Home": {
+                print("Scene set to Home!");
+                break;
+            }
+            case "Run": {
+                print("Running is not aviable yet!");
+                break;
+            }
+            case "Shop": {
+                print("Shopping is not aviable yet!");
+                if (kitten != null) {
+                    kitten.feed();
+                    saveKitten(kitten.getData());
+                }
+                break;
+            }
+            case "Play": {
+                print("Playing is not aviable yet!");
+                break;
+            }
+            case "List": {
+                int barState = View.INVISIBLE;
+                if (kitten != null && topMenu.getListVisibility() == View.INVISIBLE) {
+                    barState = View.VISIBLE;
+                }
+                barFood.setVisible(barState);
+                break;
+            }
+            case "Adopt": {
+                Intent intent = new Intent(MainActivity.this, AdoptActivity.class);
+                startActivityForResult(intent, 0);
+                break;
+            }
+            case "Statistics": {
+                print("Statistics is not aviable yet!");
+                break;
+            }
+            case "Options": {
+                print("Options is not aviable yet!");
+                break;
+            }
+        }
+    }
+
+    private void saveKitten(Bundle data) {
+        SharedPreferences.Editor save = storedData.edit();
+
+        save.putString("kittenName", data.getString("kittenName"));
+        save.putInt("kittenBodyColor", data.getInt("kittenBodyColor"));
+        save.putInt("kittenHeadColor", data.getInt("kittenHeadColor"));
+        save.putInt("kittenBodyDecorColor", data.getInt("kittenBodyDecorColor"));
+        save.putInt("kittenHeadDecorColor", data.getInt("kittenHeadDecorColor"));
+        save.putFloat("kittenVoice", data.getFloat("kittenVoice"));
+        save.putLong("kittenLastFedTime", data.getLong("kittenLastFedTime"));
+
+        save.commit();
+    }
+
+    private void clearKitten() {
+        if (kitten != null) {
+            Bundle nullData = new Bundle();
+            nullData.putString("kittenName", "");
+            nullData.putInt("kittenBodyColor", 0);
+            nullData.putInt("kittenHeadColor", 0);
+            nullData.putInt("kittenBodyDecorColor", 0);
+            nullData.putInt("kittenHeadDecorColor", 0);
+            nullData.putFloat("kittenVoice", 0);
+            nullData.putLong("kittenLastFedTime", 0);
+
+            saveKitten(nullData);
+            kitten.destroy();
+            kitten = null;
+
+            barFood.setVisible(View.INVISIBLE);
+            topMenu.enableAdoption(true);
         }
     }
 }

@@ -1,14 +1,23 @@
 package net.ledii.kittyfit.kittyfit;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class AdoptActivity extends AppCompatActivity {
@@ -18,6 +27,7 @@ public class AdoptActivity extends AppCompatActivity {
     private int KITTENS = 5;
     private Kitten kittens[];
     Intent intent;
+    EditText txtName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,11 +124,28 @@ public class AdoptActivity extends AppCompatActivity {
         btnAdopt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle catData = kittens[catNum].getData();
-                intent.putExtras(catData);
-                //print("Cat name: " + intent.getExtras().getString("name"));
-                setResult(RESULT_OK, intent);
-                finish();
+                txtName.setVisibility(View.VISIBLE);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(txtName, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
+
+        txtName = (EditText) findViewById(R.id.adopt_txt_Name);
+        txtName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    kittens[catNum].setName(txtName.getText().toString());
+
+                    Bundle catData = kittens[catNum].getData();
+                    intent.putExtras(catData);
+                    //print("Cat name: " + intent.getExtras().getString("name"));
+                    setResult(RESULT_OK, intent);
+                    finish();
+
+                    return true;
+                }
+                return false;
             }
         });
     }
