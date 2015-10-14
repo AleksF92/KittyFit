@@ -5,6 +5,29 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:background="@mipmap/bg_room_empty"
-    android:id="@+id/mainView">
+    android:id="@+id/mainView"
+    android:backgroundTint="#6f00ff"
+    android:backgroundTintMode="multiply">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Steps: 0/0"
+        android:id="@+id/txt_Steps"
+        android:textColor="@android:color/white"
+        android:textSize="24dp"
+        android:layout_above="@+id/txt_Coins"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Coins: 0 (Today: 0/0)"
+        android:id="@+id/txt_Coins"
+        android:textColor="@android:color/white"
+        android:textSize="24dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>

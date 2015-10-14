@@ -173,6 +173,7 @@ public class Kitten {
         txtName.setText(name);
         Global.addViewToParent(parentView, txtName, RelativeLayout.ALIGN_TOP, RelativeLayout.CENTER_HORIZONTAL);
         txtName.setY(y + 400);
+        txtName.setTextColor(Global.WHITE);
     }
 
     Kitten(Context context, View view, Bundle data) {

@@ -29,6 +29,7 @@ public class StatusBar extends View {
 
         txtHint = new TextView(parent);
         txtHint.setText(hint + value);
+        txtHint.setTextColor(Global.WHITE);
         Global.addViewToParent(parentView, txtHint, RelativeLayout.ALIGN_TOP, RelativeLayout.ALIGN_LEFT);
     }
 
@@ -38,6 +39,7 @@ public class StatusBar extends View {
     }
 
     public void setValue(int val) {
+        int lastValue = value;
         value = val;
         if (value > max) {
             value = max;
@@ -45,7 +47,10 @@ public class StatusBar extends View {
         else if (value < 0) {
             value = 0;
         }
-        postInvalidate();
+
+        if (value != lastValue) {
+            postInvalidate();
+        }
         //Log.d("DEBUG", "New Value: " + value + " / " + max);
     }
 
@@ -64,11 +69,15 @@ public class StatusBar extends View {
     }
 
     public void setMaxValue(int max) {
+        int lastMax = this.max;
         this.max = max;
         if (value > max) {
             value = max;
         }
-        postInvalidate();
+
+        if (this.max != lastMax) {
+            postInvalidate();
+        }
     }
 
     public int getMaxValue() {

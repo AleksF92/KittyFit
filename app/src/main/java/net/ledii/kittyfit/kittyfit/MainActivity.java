@@ -2,6 +2,7 @@ package net.ledii.kittyfit.kittyfit;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.SensorManager;
 import android.os.Handler;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.VelocityTrackerCompat;
@@ -17,6 +18,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private StatusBar barFood;
     private Runnable runGameLogic;
     private Handler runThread;
+    public Pedometer pedometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupViews();
         loadGame();
+        pedometer = new Pedometer(this);
     }
 
     @Override
@@ -192,20 +196,39 @@ public class MainActivity extends AppCompatActivity {
         runGameLogic = new Runnable() {
             @Override
             public void run() {
-                if (kitten != null) {
-                    int hoursLeft = barFood.getMaxValue() - kitten.hoursSinceLastFed();
-                    barFood.setValue(hoursLeft);
-
-                    if (hoursLeft < 0) {
-                        clearKitten();
-                    }
-                }
+                gameUpdate();
 
                 //Next tick
                 runThread.post(runGameLogic);
             }
         };
         runThread.post(runGameLogic);
+    }
+
+    private void gameUpdate() {
+        if (kitten != null) {
+            int hoursLeft = barFood.getMaxValue() - kitten.hoursSinceLastFed();
+            barFood.setValue(hoursLeft);
+
+            if (hoursLeft < 0) {
+                clearKitten();
+            }
+        }
+
+        TextView txtSteps = (TextView) findViewById(R.id.txt_Steps);
+        TextView txtCoins = (TextView) findViewById(R.id.txt_Coins);
+        String t1 = "Steps: " + pedometer.getSteps() + "/" + pedometer.getMaxSteps();
+        String t2 = "Coins: " + pedometer.getCoins() + " (Today: " + pedometer.getCoinsToday() + "/" + pedometer.getMaxCoins() + ")";
+        if (txtSteps.getText() != t1) {
+            txtSteps.setText(t1);
+        }
+        if (txtCoins.getText() != t2) {
+            txtCoins.setText(t2);
+        }
+
+        if (pedometer.maxCoinsWarning()) {
+            print("You have collected 10/10 coins today!");
+        }
     }
 
     public void sceneUpdate(String scenario) {
@@ -219,10 +242,24 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             case "Shop": {
-                print("Shopping is not aviable yet!");
+                /*
+                Intent intent = new Intent(MainActivity.this, ShopActivity.class);
+                Bundle data = new Bundle();
+                data.putInt("money", pedometer.getCoins());
+                intent.putExtras(data);
+
+                startActivity(intent);
+                */
                 if (kitten != null) {
-                    kitten.feed();
-                    saveKitten(kitten.getData());
+                    int COST = 5;
+                    if (pedometer.pay(COST)) {
+                        kitten.feed();
+                        saveKitten(kitten.getData());
+                        print("You fed " + kitten.getName() + "!");
+                    }
+                    else {
+                        print("Price: " + COST + " (You have: " + pedometer.getCoins() + ")");
+                    }
                 }
                 break;
             }
@@ -231,10 +268,17 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             case "List": {
+                int listState = View.INVISIBLE;
                 int barState = View.INVISIBLE;
-                if (kitten != null && topMenu.getListVisibility() == View.INVISIBLE) {
+
+                if (topMenu.getListVisibility() == View.INVISIBLE) {
+                    listState = View.VISIBLE;
+                }
+                else if (kitten != null) {
                     barState = View.VISIBLE;
                 }
+
+                topMenu.showList(listState);
                 barFood.setVisible(barState);
                 break;
             }

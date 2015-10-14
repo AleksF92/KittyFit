@@ -3,6 +3,7 @@ package net.ledii.kittyfit.kittyfit;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
@@ -34,6 +35,7 @@ public class TopMenu {
         //Create buttons
         btnRun = new ImageButton(parent);
         btnRun.setBackgroundResource(R.mipmap.btn_cute);
+        btnRun.getBackground().setColorFilter(Global.COLOR_BUTTONS, PorterDuff.Mode.MULTIPLY);
         btnRun.setImageResource(R.mipmap.img_menu_run);
         btnRun.setAdjustViewBounds(true);
         btnRun.setVisibility(View.INVISIBLE);
@@ -41,6 +43,7 @@ public class TopMenu {
 
         btnShop = new ImageButton(parent);
         btnShop.setBackgroundResource(R.mipmap.btn_cute);
+        btnShop.getBackground().setColorFilter(Global.COLOR_BUTTONS, PorterDuff.Mode.MULTIPLY);
         btnShop.setImageResource(R.mipmap.img_menu_shop);
         btnShop.setAdjustViewBounds(true);
         btnShop.setVisibility(View.INVISIBLE);
@@ -48,6 +51,7 @@ public class TopMenu {
 
         btnPlay = new ImageButton(parent);
         btnPlay.setBackgroundResource(R.mipmap.btn_cute);
+        btnPlay.getBackground().setColorFilter(Global.COLOR_BUTTONS, PorterDuff.Mode.MULTIPLY);
         btnPlay.setImageResource(R.mipmap.img_menu_play);
         btnPlay.setAdjustViewBounds(true);
         btnPlay.setVisibility(View.INVISIBLE);
@@ -55,6 +59,7 @@ public class TopMenu {
 
         btnList = new ImageButton(parent);
         btnList.setBackgroundResource(R.mipmap.btn_cute);
+        btnList.getBackground().setColorFilter(Global.COLOR_BUTTONS, PorterDuff.Mode.MULTIPLY);
         btnList.setImageResource(R.mipmap.img_menu_list);
         btnList.setAdjustViewBounds(true);
         btnList.setVisibility(View.INVISIBLE);
@@ -68,18 +73,21 @@ public class TopMenu {
 
         btnListAdopt = new Button(parent);
         btnListAdopt.setBackgroundResource(R.mipmap.btn_cute);
+        btnListAdopt.getBackground().setColorFilter(Global.COLOR_BUTTONS, PorterDuff.Mode.MULTIPLY);
         btnListAdopt.setText("Adopt kitten");
         btnListAdopt.setVisibility(View.INVISIBLE);
         Global.addViewToParent(parentView, btnListAdopt, RelativeLayout.ALIGN_TOP, RelativeLayout.CENTER_HORIZONTAL);
 
         btnListStats = new Button(parent);
         btnListStats.setBackgroundResource(R.mipmap.btn_cute);
+        btnListStats.getBackground().setColorFilter(Global.COLOR_BUTTONS, PorterDuff.Mode.MULTIPLY);
         btnListStats.setText("Statistics");
         btnListStats.setVisibility(View.INVISIBLE);
         Global.addViewToParent(parentView, btnListStats, RelativeLayout.ALIGN_TOP, RelativeLayout.CENTER_HORIZONTAL);
 
         btnListOptions = new Button(parent);
         btnListOptions.setBackgroundResource(R.mipmap.btn_cute);
+        btnListOptions.getBackground().setColorFilter(Global.COLOR_BUTTONS, PorterDuff.Mode.MULTIPLY);
         btnListOptions.setText("Options");
         btnListOptions.setVisibility(View.INVISIBLE);
         Global.addViewToParent(parentView, btnListOptions, RelativeLayout.ALIGN_TOP, RelativeLayout.CENTER_HORIZONTAL);
@@ -240,35 +248,6 @@ public class TopMenu {
 
     private void clickButton(String btnName) {
         if (active) {
-            switch (btnName) {
-                case "Run": {
-                    break;
-                }
-                case "Shop": {
-                    break;
-                }
-                case "Play": {
-                    break;
-                }
-                case "List": {
-                    int listToggle = View.INVISIBLE;
-                    if (btnListAdopt.getVisibility() == View.INVISIBLE) {
-                        listToggle = View.VISIBLE;
-                    }
-                    showList(listToggle);
-                    break;
-                }
-                case "Adopt": {
-                    break;
-                }
-                case "Statistics": {
-                    break;
-                }
-                case "Options": {
-                    break;
-                }
-            }
-
             ((MainActivity) parent).sceneUpdate(btnName);
             //Toast.makeText(parent, btnName + " was clicked!", Toast.LENGTH_SHORT).show();
         }

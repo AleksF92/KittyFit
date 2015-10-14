@@ -12,8 +12,11 @@ public class Global {
     public static int BROWN = 0xFF825030;
     public static int DK_BROWN = 0xFF543D2F;
     public static int LT_YELLOW = 0xFFFFD468;
+    public static int LT_ORANGE = 0xFFFF9C32;
     public static int ORANGE = 0xFFF77300;
     public static int LIME = 0xFF00FF00;
+
+    public static int COLOR_BUTTONS = LT_ORANGE;
 
     public static void addViewToParent(View parentView, View view, int alignY, int alignX) {
         RelativeLayout rl = (RelativeLayout) parentView;

@@ -5,9 +5,9 @@
     android:layout_height="match_parent"
     tools:context="net.ledii.kittyfit.kittyfit.AdoptActivity"
     android:background="@mipmap/bg_room_empty"
-    android:backgroundTint="#009d0f"
+    android:backgroundTint="#6f00ff"
     android:id="@+id/adoptView"
-    android:backgroundTintMode="screen"
+    android:backgroundTintMode="multiply"
     android:clickable="false">
 
     <ImageButton
@@ -36,7 +36,7 @@
         android:background="@mipmap/btn_cute"
         android:allowUndo="false"
         android:alpha="1"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/adopt_txt_Name"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp" />
 
@@ -45,15 +45,24 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:id="@+id/adopt_txt_Name"
-        android:layout_below="@+id/adopt_btn_Adopt"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
         android:background="#ffffff"
-        android:visibility="invisible"
         android:hint="Name your kitten"
         android:inputType="text|textCapWords"
         android:textColor="#010101"
         android:textColorHint="#61010101"
-        android:maxLength="24" />
+        android:maxLength="24"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/shop_txt_Room"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Adopt kitten"
+        android:id="@+id/shop_txt_Room"
+        android:textSize="24dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/white" />
 
 </RelativeLayout>

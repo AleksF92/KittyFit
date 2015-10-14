@@ -2,6 +2,7 @@ package net.ledii.kittyfit.kittyfit;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -120,32 +121,28 @@ public class AdoptActivity extends AppCompatActivity {
             }
         });
 
+        txtName = (EditText) findViewById(R.id.adopt_txt_Name);
+
         Button btnAdopt = (Button) findViewById(R.id.adopt_btn_Adopt);
+        btnAdopt.getBackground().setColorFilter(Global.COLOR_BUTTONS, PorterDuff.Mode.MULTIPLY);
+
         btnAdopt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                txtName.setVisibility(View.VISIBLE);
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(txtName, InputMethodManager.SHOW_IMPLICIT);
-            }
-        });
-
-        txtName = (EditText) findViewById(R.id.adopt_txt_Name);
-        txtName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                String txt = txtName.getText().toString();
+                //Log.d("DEBUG", "TxtName: '" + txt + "'");
+                if (!txt.isEmpty()) {
                     kittens[catNum].setName(txtName.getText().toString());
 
                     Bundle catData = kittens[catNum].getData();
                     intent.putExtras(catData);
-                    //print("Cat name: " + intent.getExtras().getString("name"));
                     setResult(RESULT_OK, intent);
-                    finish();
 
-                    return true;
+                    finish();
                 }
-                return false;
+                else {
+                    print("You must name your kitten!");
+                }
             }
         });
     }
