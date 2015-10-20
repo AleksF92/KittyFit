@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
         barFood = new StatusBar(this, thisView);
         Global.addViewToParent(thisView, barFood, RelativeLayout.ALIGN_TOP, RelativeLayout.ALIGN_LEFT);
+        barFood.setX(60);
         barFood.setY(500);
         barFood.setHint("Food: ");
         barFood.setSuffix("h");
@@ -238,7 +239,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             case "Run": {
-                print("Running is not aviable yet!");
+                Intent intent = new Intent(MainActivity.this, RunActivity.class);
+                startActivity(intent);
                 break;
             }
             case "Shop": {

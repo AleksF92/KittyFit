@@ -31,6 +31,8 @@ public class StatusBar extends View {
         txtHint.setText(hint + value);
         txtHint.setTextColor(Global.WHITE);
         Global.addViewToParent(parentView, txtHint, RelativeLayout.ALIGN_TOP, RelativeLayout.ALIGN_LEFT);
+
+        txtHint.setVisibility(INVISIBLE);
     }
 
     StatusBar(Context context, View view, int max) {
@@ -88,12 +90,10 @@ public class StatusBar extends View {
     public void onDraw(Canvas canvas) {
         Paint paint = new Paint();
         paint.setStrokeWidth(1);
-        paint.setColor(Global.DK_GRAY);
+        paint.setColor(Global.WHITE);
 
-        float hw = size.x / 2;
-        float cx = canvas.getWidth() / 2;
-        float x1 = getX() + cx - hw;
-        float x2 = getX() + cx + hw;
+        float x1 = getX();
+        float x2 = x1 + size.x;
         float y1 = getY();
         float y2 = y1 + size.y;
 
@@ -104,15 +104,21 @@ public class StatusBar extends View {
         x2 = x1 + (size.x * percent);
         canvas.drawRect(x1, y1, x2, y2, paint);
 
-        if (hint != "") {
-            txtHint.setX(x1);
-            txtHint.setY((y1 - size.y) * 2);
-            txtHint.setText(hint + value + suffix);
-        }
+        x1 *= 2;
+        y1 = ((y1 - size.y) * 2) + 16;
+        txtHint.setX(x1);
+        txtHint.setY(y1);
+        txtHint.setText(hint + value + suffix);
     }
 
     public void setVisible(int state) {
         setVisibility(state);
         txtHint.setVisibility(state);
+    }
+
+    public void setSize(int x, int y) {
+        size.x = x;
+        size.y = y;
+        postInvalidate();
     }
 }

@@ -15,6 +15,7 @@ public class Global {
     public static int LT_ORANGE = 0xFFFF9C32;
     public static int ORANGE = 0xFFF77300;
     public static int LIME = 0xFF00FF00;
+    public static int BLACK = 0xFF000000;
 
     public static int COLOR_BUTTONS = LT_ORANGE;
 

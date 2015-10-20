@@ -9,4 +9,5 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_shop">ShopActivity</string>
+    <string name="title_activity_run">RunActivity</string>
 </resources>
